@@ -16,7 +16,7 @@
         <span class="qtype">【单选题】</span>
         <span class="question-body">{{ question.question }}</span>
       </p>
-      <el-radio-group v-model="value" class="options-wrapper force-wrap">
+      <el-radio-group v-model="value" :class="`options-wrapper force-wrap${viewAnswer ? ' viewAnswer' : ''}`">
         <el-radio v-for="(item, i) in question.options" :label="i" :disabled="viewAnswer">
           <div>
             <span>{{ renderOptionChar(i) }}.</span>
@@ -24,7 +24,7 @@
           </div>
         </el-radio>
       </el-radio-group>
-      <p class="answer">【答】{{ question.answer }}</p>
+      <p v-if="viewAnswer" class="answer">【答】{{ question.answer }}</p>
     </div>
     <!-- 填空题 -->
     <div v-if="question.type === 'blanks'" class="inner-qb">
@@ -42,7 +42,7 @@
         <span class="qtype">【判断题】</span>
         <span class="question-body">{{ question.question }}</span>
       </p>
-      <el-radio-group v-model="value" class="options-wrapper">
+      <el-radio-group v-model="value" :class="`options-wrapper${viewAnswer ? ' viewAnswer' : ''}`">
         <span v-if="viewAnswer" class="answer">【答】</span>
         <el-radio :label="0" :disabled="viewAnswer">错误</el-radio>
         <el-radio :label="1" :disabled="viewAnswer">正确</el-radio>
@@ -59,7 +59,7 @@
         【答】
         <span v-if="typeof (question.answer) === 'string'">{{ question.answer }}</span>
       </p>
-      <ul v-if="(question.answer instanceof Array)">
+      <ul v-if="viewAnswer && (question.answer instanceof Array)">
         <li v-for="(a, i) in question.answer" class="answer"><span>{{ `（${i + 1}）${a}` }}</span></li>
       </ul>
     </div>
@@ -92,39 +92,42 @@ watch(() => props.viewAnswer, (newv) => {
   // 如果切换为不显示答案则重置当前value
   if (!newv) {
     value.value = null
+  } else {
+    loadAnswer()
   }
 })
+
+const loadAnswer = () => {
+  const _question = unref(question)
+  // 单选题
+  if (_question.type === 'select') {
+    const { answer } = _question
+    let index
+    if (typeof (answer) === 'string') {
+      index = answer.charCodeAt(answer)
+    }
+    if (typeof (answer) === 'number') {
+      index = answer
+    }
+
+    index = index - 65
+    if (index > 31) {
+      index = index - 32
+    }
+    value.value = index;
+  }
+  // 判断题
+  if (_question.type === 'judgement') {
+    const { answer } = _question
+    value.value = answer ? 1 : 0;
+  }
+}
 
 // 加载后初始化函数
 onMounted(() => {
   // 如果显示答案
   if (props.viewAnswer) {
-    const _question = unref(question)
-    // 单选题
-    if (_question.type === 'select') {
-      const { answer } = _question
-      let index
-      if (typeof (answer) === 'string') {
-        index = answer.charCodeAt(answer)
-      }
-      if (typeof (answer) === 'number') {
-        index = answer
-      }
-
-      index = index - 65
-      if (index > 31) {
-        index = index - 32
-      }
-
-      value.value = index;
-    }
-    // 判断题
-    if (_question.type === 'judgement') {
-      const { answer } = _question
-      value.value = answer ? 1 : 0;
-    }
-
-
+    loadAnswer()
   }
 })
 

@@ -1,14 +1,14 @@
-.options-wrapper .el-radio__input.is-checked .el-radio__inner {
+.options-wrapper.viewAnswer .el-radio__input.is-checked .el-radio__inner {
   background: green;
   border-color: green;
 }
 
-.options-wrapper .is-checked .el-radio__input.is-checked+.el-radio__label,
-.options-wrapper .options-wrapper .is-checked .el-radio__input.is-checked+.el-radio__label {
+.options-wrapper.viewAnswer .is-checked .el-radio__input.is-checked+.el-radio__label,
+.options-wrapper.viewAnswer .is-checked .el-radio__input.is-checked+.el-radio__label {
   color: green;
   font-weight: bold;
 }
 
-.options-wrapper .el-radio__input.is-disabled.is-checked .el-radio__inner {
+.options-wrapper.viewAnswer .el-radio__input.is-disabled.is-checked .el-radio__inner {
   background-color: green;
 }
